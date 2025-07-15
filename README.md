@@ -260,7 +260,6 @@ npm run dev
 
 ### 🎯 **Introduction (5 min)**
 
-**"Bonjour, je vais vous présenter une solution blockchain pour révolutionner l'administration sénégalaise."**
 
 1. **Problème actuel** :
    - Montrer statistiques fraudes documents
