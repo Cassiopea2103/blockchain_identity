@@ -10,7 +10,19 @@ export default defineConfig({
   ],
   server: {
     headers: {
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https: wss: ws: http://localhost:*; img-src 'self' data: https:;"
+      'Content-Security-Policy': [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "connect-src 'self' https: wss: ws: http://localhost:* https://*.infura.io https://*.alchemy.com https://*.polygon.rpc https://*.ethereum.org",
+        "img-src 'self' data: https:",
+        "media-src 'self' data:",
+        "object-src 'none'",
+        "child-src 'none'",
+        "worker-src 'self' blob:",
+        "frame-src 'none'"
+      ].join('; ')
     }
   },
   define: {

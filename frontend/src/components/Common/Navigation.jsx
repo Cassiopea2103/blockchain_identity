@@ -116,7 +116,10 @@ const Navigation = () => {
           <div className="flex items-center space-x-4">
             {!isConnected ? (
               <button
-                onClick={connectWallet}
+                onClick={() => {
+                  console.log('🟢 Button Clicked');
+                  connectWallet();
+                }}
                 className="flex items-center space-x-2 bg-senegal-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
                 <WalletIcon className="w-5 h-5" />

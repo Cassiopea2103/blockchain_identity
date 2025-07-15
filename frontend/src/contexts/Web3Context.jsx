@@ -35,66 +35,80 @@ export const Web3Provider = ({ children }) => {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   // Configuration du réseau
-  const CONTRACT_ADDRESS = import.meta.env.REACT_APP_CONTRACT_ADDRESS || "0xcA97af9d0D61CE2b0f6BEd68187800f61373663D"; // Adresse par défaut Hardhat
+  const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || "0xcA97af9d0D61CE2b0f6BEd68187800f61373663D"; // Adresse par défaut Hardhat
   console.log('Contract Address:', CONTRACT_ADDRESS);
-  // Connecter à MetaMask
-  const connectWallet = async () => {
-    try {
-      setIsLoading(true);
-      
-      if (!window.ethereum) {
-        toast.error('MetaMask n\'est pas installé !');
-        return;
-      }
 
-      // Demander la connexion
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts'
-      });
+  // Connecter à MetaMask - VERSION ETHERS V6 COMPATIBLE
+const connectWallet = async () => {
+  console.log('🔌 connectWallet called');
 
-      if (accounts.length === 0) {
-        toast.error('Aucun compte sélectionné');
-        return;
-      }
-
-      // Créer le provider
-      const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
-      const web3Signer = web3Provider.getSigner();
-      const network = await web3Provider.getNetwork();
-
-      // Créer l'instance du contrat
-      const contractInstance = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        CONTRACT_ABI,
-        web3Signer
-      );
-
-      // Vérifier si l'utilisateur est une autorité autorisée
-      let authorized = false;
-      try {
-        authorized = await contractInstance.isAuthorizedIssuer(accounts[0]);
-      } catch (error) {
-        console.log('Erreur vérification autorisation:', error);
-      }
-
-      // Mettre à jour les états
-      setAccount(accounts[0]);
-      setProvider(web3Provider);
-      setSigner(web3Signer);
-      setContract(contractInstance);
-      setChainId(network.chainId);
-      setIsConnected(true);
-      setIsAuthorized(authorized);
-
-      toast.success('Wallet connecté avec succès !');
-      
-    } catch (error) {
-      console.error('Erreur connexion wallet:', error);
-      toast.error('Erreur lors de la connexion au wallet');
-    } finally {
-      setIsLoading(false);
+  try {
+    setIsLoading(true);
+    
+    if (!window.ethereum) {
+      toast.error('MetaMask n\'est pas installé !');
+      console.error('❌ MetaMask not detected');
+      return;
     }
-  };
+
+    console.log('⏳ Requesting account access...');
+    const accounts = await window.ethereum.request({
+      method: 'eth_requestAccounts'
+    });
+
+    if (accounts.length === 0) {
+      toast.error('Aucun compte sélectionné');
+      console.warn('⚠️ No accounts returned by MetaMask');
+      return;
+    }
+
+    console.log('✅ Accounts received:', accounts);
+    const web3Provider = new ethers.BrowserProvider(window.ethereum);
+    console.log('📡 BrowserProvider created:', web3Provider);
+
+    const web3Signer = await web3Provider.getSigner();
+    console.log('✍️ Signer retrieved:', await web3Signer.getAddress());
+
+    const network = await web3Provider.getNetwork();
+    console.log('🌐 Network info:', network);
+
+    const contractInstance = new ethers.Contract(
+      CONTRACT_ADDRESS,
+      CONTRACT_ABI,
+      web3Signer
+    );
+    console.log('📜 Contract instance created:', contractInstance);
+
+    // Check issuer authorization
+    let authorized = false;
+    try {
+      authorized = await contractInstance.isAuthorizedIssuer(accounts[0]);
+      console.log('🔐 Is authorized issuer:', authorized);
+    } catch (error) {
+      console.error('❌ Error checking authorization:', error);
+    }
+
+    // Update state
+    setAccount(accounts[0]);
+    setProvider(web3Provider);
+    setSigner(web3Signer);
+    setContract(contractInstance);
+    setChainId(Number(network.chainId));
+    setIsConnected(true);
+    setIsAuthorized(authorized);
+
+    toast.success('✅ Wallet connecté avec succès !');
+    console.log('🎉 Wallet connection successful');
+
+  } catch (error) {
+    console.error('❌ Erreur connexion wallet:', error);
+    toast.error('Erreur lors de la connexion au wallet');
+  } finally {
+    setIsLoading(false);
+    console.log('🔚 connectWallet finished');
+  }
+};
+
 
   // Déconnecter le wallet
   const disconnectWallet = () => {
@@ -161,8 +175,8 @@ export const Web3Provider = ({ children }) => {
         holderName: result.holderName,
         certificateType: result.certificateType,
         issuer: result.issuer,
-        issueDate: new Date(result.issueDate.toNumber() * 1000),
-        expiryDate: result.expiryDate.toNumber() === 0 ? null : new Date(result.expiryDate.toNumber() * 1000),
+        issueDate: result.issueDate ? new Date(Number(result.issueDate) * 1000) : null,
+        expiryDate: result.expiryDate ? new Date(Number(result.expiryDate) * 1000) : null,
         ipfsHash: result.ipfsHash
       };
 
@@ -172,17 +186,16 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  // Obtenir les certificats d'un utilisateur
-  const getUserCertificates = async (userAddress = null) => {
+  // Obtenir les certificats de l'utilisateur
+  const getUserCertificates = async (userAddress) => {
     try {
       if (!contract) {
         throw new Error('Contrat non initialisé');
       }
 
-      const address = userAddress || account;
-      const certificateIds = await contract.getCertificatesByHolder(address);
-      
+      const certificateIds = await contract.getCertificatesByHolder(userAddress || account);
       const certificates = [];
+
       for (const id of certificateIds) {
         try {
           const cert = await contract.getCertificate(id);
@@ -193,8 +206,8 @@ export const Web3Provider = ({ children }) => {
             certificateType: cert.certificateType,
             ipfsHash: cert.ipfsHash,
             issuer: cert.issuer,
-            issueDate: new Date(cert.issueDate.toNumber() * 1000),
-            expiryDate: cert.expiryDate.toNumber() === 0 ? null : new Date(cert.expiryDate.toNumber() * 1000),
+            issueDate: cert.issueDate ? new Date(Number(cert.issueDate) * 1000) : null,
+            expiryDate: cert.expiryDate ? new Date(Number(cert.expiryDate) * 1000) : null,
             isValid: cert.isValid,
             metadata: cert.metadata
           });
@@ -221,7 +234,7 @@ export const Web3Provider = ({ children }) => {
       const totalCertificates = await contract.getTotalCertificates();
       
       return {
-        totalCertificates: totalCertificates.toNumber()
+        totalCertificates: Number(totalCertificates)
       };
 
     } catch (error) {
@@ -233,25 +246,26 @@ export const Web3Provider = ({ children }) => {
   // Écouter les changements de compte
   useEffect(() => {
     if (window.ethereum) {
-      window.ethereum.on('accountsChanged', (accounts) => {
+      const handleAccountsChanged = (accounts) => {
         if (accounts.length === 0) {
           disconnectWallet();
         } else {
           setAccount(accounts[0]);
         }
-      });
+      };
 
-      window.ethereum.on('chainChanged', () => {
+      const handleChainChanged = () => {
         window.location.reload();
-      });
-    }
+      };
 
-    return () => {
-      if (window.ethereum) {
-        window.ethereum.removeAllListeners('accountsChanged');
-        window.ethereum.removeAllListeners('chainChanged');
-      }
-    };
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      window.ethereum.on('chainChanged', handleChainChanged);
+
+      return () => {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        window.ethereum.removeListener('chainChanged', handleChainChanged);
+      };
+    }
   }, []);
 
   // Vérifier la connexion au chargement
