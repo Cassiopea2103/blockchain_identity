@@ -35,8 +35,8 @@ export const Web3Provider = ({ children }) => {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   // Configuration du réseau
-  const CONTRACT_ADDRESS = import.meta.env.REACT_APP_CONTRACT_ADDRESS || "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Adresse par défaut Hardhat
-
+  const CONTRACT_ADDRESS = import.meta.env.REACT_APP_CONTRACT_ADDRESS || "0xcA97af9d0D61CE2b0f6BEd68187800f61373663D"; // Adresse par défaut Hardhat
+  console.log('Contract Address:', CONTRACT_ADDRESS);
   // Connecter à MetaMask
   const connectWallet = async () => {
     try {
