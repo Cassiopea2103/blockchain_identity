@@ -31,7 +31,7 @@ Ce projet démontre comment la blockchain peut révolutionner la gestion des doc
 - **Web3** : Ethers.js v6
 - **Wallet** : MetaMask
 - **QR Code** : qrcode.js
-- **Stockage** : IPFS (simulation)
+- **Stockage** : IPFS 
 - **IDE** : Remix pour déploiement
 
 ### Composants principaux
@@ -489,7 +489,6 @@ VITE_CHAIN_ID=80001
 VITE_RPC_URL=https://rpc-mumbai.maticvigil.com
 ```
 
-## 🤝 Contribution
 
 ### Structure du projet
 
@@ -512,33 +511,7 @@ identite-numerique-senegal/
 └── README.md
 ```
 
-### Guidelines
-
-1. **Code style** : ESLint + Prettier
-2. **Commits** : Convention Conventional Commits
-3. **Tests** : Couverture > 80%
-4. **Documentation** : JSDoc pour fonctions
-
 ## 📄 Licence
 
 MIT License - Voir [LICENSE](LICENSE) pour détails.
 
-## 🌟 Remerciements
-
-- **Communauté Ethereum** pour les outils
-- **OpenZeppelin** pour les contrats sécurisés
-- **Tailwind CSS** pour l'interface
-- **Diaspora sénégalaise** pour l'inspiration
-
----
-
-## 🆘 Support
-
-Pour questions ou support :
-- **Issues GitHub** : [Créer une issue](https://github.com/votre-username/identite-numerique-senegal/issues)
-- **Documentation** : [Wiki du projet](https://github.com/votre-username/identite-numerique-senegal/wiki)
-- **Discord** : [Communauté développeurs](https://discord.gg/votre-serveur)
-
----
-
-**🇸🇳 Fait avec ❤️ pour le Sénégal et sa diaspora mondiale**
