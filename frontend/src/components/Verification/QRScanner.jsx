@@ -228,7 +228,7 @@ const QRScanner = () => {
                     file:rounded-lg file:border-0
                     file:text-sm file:font-semibold
                     file:bg-senegal-green file:text-white
-                    hover:file:bg-green-700"
+                    file:bg-green-700"
                 />
               </div>
 

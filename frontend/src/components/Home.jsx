@@ -201,7 +201,6 @@ const Home = () => {
       {/* Fonctionnalités */}
       <section className="bg-gray-50 p-8 rounded-xl">
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
-          ✨ Avantages de la Blockchain
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
@@ -221,7 +220,7 @@ const Home = () => {
       </section>
 
       {/* Problèmes résolus */}
-      <section className="bg-white p-8 rounded-xl shadow-lg">
+      {/* <section className="bg-white p-8 rounded-xl shadow-lg">
         <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">
           🎯 Problèmes Résolus
         </h2>
@@ -253,7 +252,7 @@ const Home = () => {
             </ul>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Call to action */}
       <section className="text-center py-12 bg-gradient-to-t bg-slate-900 to bg-cyan-200 rounded-xl">

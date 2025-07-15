@@ -52,7 +52,7 @@ function App() {
                 Système de Gestion Décentralisée de l'Identité Numérique
               </p>
               <p className="text-sm mt-4 opacity-75">
-                Projet académique - Blockchain pour l'administration sénégalaise
+                Blockchain pour l'administration sénégalaise
               </p>
             </div>
           </footer>

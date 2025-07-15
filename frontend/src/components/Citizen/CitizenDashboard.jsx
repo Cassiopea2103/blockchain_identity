@@ -9,25 +9,27 @@ import {
   BuildingOfficeIcon,
   ArrowDownTrayIcon,
   MagnifyingGlassIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 const CitizenDashboard = () => {
-  const { account, isConnected, getCitizenCertificates } = useWeb3();
+  const { account, isConnected, contract } = useWeb3();
   const [certificates, setCertificates] = useState([]);
   const [filteredCertificates, setFilteredCertificates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (isConnected && account) {
+    if (isConnected && account && contract) {
       loadCertificates();
     } else {
       setIsLoading(false);
     }
-  }, [isConnected, account]);
+  }, [isConnected, account, contract]);
 
   useEffect(() => {
     filterCertificates();
@@ -36,52 +38,61 @@ const CitizenDashboard = () => {
   const loadCertificates = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       
-      // En production, cela viendrait du smart contract
-      // Pour la démo, utilisons des données simulées
-      const mockCertificates = [
-        {
-          id: 'SN-NAISS-20240315-ABC123',
-          type: 'Acte de Naissance',
-          holderName: 'Amadou Diallo',
-          issueDate: '2024-03-15',
-          expiryDate: null,
-          status: 'Actif',
-          issuer: 'Mairie de Dakar',
-          ipfsHash: 'QmXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-          qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANS...'
-        },
-        {
-          id: 'SN-CNI-20230220-DEF456',
-          type: 'Carte Nationale d\'Identité',
-          holderName: 'Amadou Diallo',
-          issueDate: '2023-02-20',
-          expiryDate: '2033-02-20',
-          status: 'Actif',
-          issuer: 'Direction de l\'État Civil',
-          ipfsHash: 'QmYxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-          qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANS...'
-        },
-        {
-          id: 'SN-DIPL-20220615-GHI789',
-          type: 'Diplôme Universitaire',
-          holderName: 'Amadou Diallo',
-          issueDate: '2022-06-15',
-          expiryDate: null,
-          status: 'Actif',
-          issuer: 'Université Cheikh Anta Diop',
-          ipfsHash: 'QmZxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-          qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANS...'
-        }
-      ];
+      console.log('🔍 Chargement des certificats pour:', account);
+      
+      // Récupérer les IDs de certificats du détenteur
+      const certificateIds = await contract.getCertificatesByHolder(account);
+      console.log('📋 IDs des certificats trouvés:', certificateIds);
+      
+      if (certificateIds.length === 0) {
+        setCertificates([]);
+        setFilteredCertificates([]);
+        return;
+      }
 
-      // Simuler un appel API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Récupérer les détails de chaque certificat
+      const certificateDetails = [];
       
-      setCertificates(mockCertificates);
-      setFilteredCertificates(mockCertificates);
+      for (const id of certificateIds) {
+        try {
+          console.log(`🔍 Récupération détails certificat: ${id}`);
+          const cert = await contract.getCertificate(id);
+          
+          // Formater les données pour l'affichage
+          const formattedCert = {
+            id: cert.certificateId || id,
+            type: cert.certificateType,
+            holderName: cert.holderName,
+            holderAddress: cert.holderAddress,
+            issueDate: cert.issueDate ? new Date(Number(cert.issueDate) * 1000) : null,
+            expiryDate: cert.expiryDate && Number(cert.expiryDate) > 0 ? new Date(Number(cert.expiryDate) * 1000) : null,
+            status: cert.isValid ? 'Actif' : 'Révoqué',
+            issuer: cert.issuer,
+            ipfsHash: cert.ipfsHash,
+            metadata: cert.metadata
+          };
+          
+          certificateDetails.push(formattedCert);
+          console.log(`✅ Certificat ${id} traité:`, formattedCert);
+          
+        } catch (error) {
+          console.error(`❌ Erreur récupération certificat ${id}:`, error);
+          // Continuer avec les autres certificats même si un échoue
+        }
+      }
+      
+      setCertificates(certificateDetails);
+      setFilteredCertificates(certificateDetails);
+      
+      if (certificateDetails.length > 0) {
+        toast.success(`${certificateDetails.length} certificat(s) chargé(s)`);
+      }
+      
     } catch (error) {
-      console.error('Erreur chargement certificats:', error);
+      console.error('❌ Erreur chargement certificats:', error);
+      setError(error.message);
       toast.error('Erreur lors du chargement des certificats');
     } finally {
       setIsLoading(false);
@@ -101,22 +112,51 @@ const CitizenDashboard = () => {
       filtered = filtered.filter(cert => 
         cert.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         cert.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cert.issuer.toLowerCase().includes(searchTerm.toLowerCase())
+        cert.holderName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (typeof cert.issuer === 'string' && cert.issuer.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
     setFilteredCertificates(filtered);
   };
 
+  const formatAddress = (address) => {
+    if (typeof address === 'string' && address.startsWith('0x')) {
+      return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    }
+    return address;
+  };
+
+  const formatDate = (date) => {
+    if (!date) return 'N/A';
+    return date.toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   const handleDownloadCertificate = (certificateId, ipfsHash) => {
-    // En production, télécharger depuis IPFS
-    toast.success(`Téléchargement du certificat ${certificateId}`);
-    // window.open(`https://ipfs.io/ipfs/${ipfsHash}`, '_blank');
+    if (ipfsHash && ipfsHash !== '') {
+      // En production, télécharger depuis IPFS
+      toast.success(`Téléchargement du certificat ${certificateId}`);
+      // window.open(`https://ipfs.io/ipfs/${ipfsHash}`, '_blank');
+    } else {
+      toast.info('Document IPFS non disponible pour ce certificat');
+    }
   };
 
   const handleShowQRCode = (certificateId) => {
-    // Afficher le QR code dans un modal ou nouvelle fenêtre
-    toast.info(`QR Code pour ${certificateId}`);
+    // Générer l'URL de vérification
+    const verificationUrl = `${window.location.origin}/verify?id=${certificateId}`;
+    toast.success(`QR Code généré pour ${certificateId}`, {
+      duration: 3000
+    });
+    console.log('URL de vérification:', verificationUrl);
+  };
+
+  const handleRefresh = () => {
+    loadCertificates();
   };
 
   if (!isConnected) {
@@ -147,21 +187,35 @@ const CitizenDashboard = () => {
     'Carte Nationale d\'Identité',
     'Diplôme Universitaire',
     'Certificat de Mariage',
-    'Certificat de Décès'
+    'Certificat de Décès',
+    'Permis de Conduire',
+    'Certificat de Scolarité'
   ];
 
   return (
     <div className="space-y-8">
       {/* En-tête */}
       <div className="bg-white rounded-xl shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          Mes Certificats Numériques
-        </h1>
-        <p className="text-gray-600">
-          Consultez et gérez vos documents officiels sécurisés sur la blockchain
-        </p>
-        <div className="mt-4 text-sm text-gray-500">
-          Wallet connecté: {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : 'Non connecté'}
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              Mes Certificats Numériques
+            </h1>
+            <p className="text-gray-600">
+              Consultez et gérez vos documents officiels sécurisés sur la blockchain
+            </p>
+            <div className="mt-4 text-sm text-gray-500">
+              Wallet connecté: {formatAddress(account)}
+            </div>
+          </div>
+          <button
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="flex items-center space-x-2 bg-senegal-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+          >
+            <ArrowPathIcon className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>Actualiser</span>
+          </button>
         </div>
       </div>
 
@@ -172,7 +226,7 @@ const CitizenDashboard = () => {
             <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Rechercher par ID, type ou émetteur..."
+              placeholder="Rechercher par ID, type ou nom..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-senegal-green focus:border-transparent"
@@ -191,12 +245,31 @@ const CitizenDashboard = () => {
         </div>
       </div>
 
+      {/* Gestion des erreurs */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+          <div className="flex items-center">
+            <ExclamationTriangleIcon className="w-6 h-6 text-red-600 mr-3" />
+            <div>
+              <h3 className="text-red-800 font-semibold">Erreur de chargement</h3>
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          </div>
+          <button
+            onClick={handleRefresh}
+            className="mt-3 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Réessayer
+          </button>
+        </div>
+      )}
+
       {/* Liste des certificats */}
       {isLoading ? (
         <div className="bg-white rounded-xl shadow-lg p-8">
           <div className="text-center">
             <ArrowPathIcon className="w-8 h-8 text-gray-400 animate-spin mx-auto mb-2" />
-            <p className="text-gray-600">Chargement de vos certificats...</p>
+            <p className="text-gray-600">Chargement de vos certificats depuis la blockchain...</p>
           </div>
         </div>
       ) : filteredCertificates.length === 0 ? (
@@ -208,6 +281,11 @@ const CitizenDashboard = () => {
                 ? 'Aucun certificat ne correspond à votre recherche'
                 : 'Vous n\'avez pas encore de certificats numériques'}
             </p>
+            {certificates.length === 0 && (
+              <p className="text-sm text-gray-500 mt-2">
+                Les certificats créés pour votre adresse wallet apparaîtront ici.
+              </p>
+            )}
           </div>
         </div>
       ) : (
@@ -219,6 +297,8 @@ const CitizenDashboard = () => {
                 certificate.type === 'Acte de Naissance' ? 'bg-blue-500' :
                 certificate.type === 'Carte Nationale d\'Identité' ? 'bg-green-500' :
                 certificate.type === 'Diplôme Universitaire' ? 'bg-purple-500' :
+                certificate.type === 'Certificat de Mariage' ? 'bg-pink-500' :
+                certificate.type === 'Permis de Conduire' ? 'bg-orange-500' :
                 'bg-gray-500'
               } text-white`}>
                 <DocumentTextIcon className="w-8 h-8 mb-2" />
@@ -229,7 +309,7 @@ const CitizenDashboard = () => {
               <div className="p-6 space-y-4">
                 <div>
                   <p className="text-xs text-gray-500">ID du certificat</p>
-                  <p className="font-mono text-sm">{certificate.id}</p>
+                  <p className="font-mono text-sm break-all">{certificate.id}</p>
                 </div>
 
                 <div>
@@ -237,13 +317,20 @@ const CitizenDashboard = () => {
                   <p className="font-semibold">{certificate.holderName}</p>
                 </div>
 
+                {certificate.holderAddress && (
+                  <div>
+                    <p className="text-xs text-gray-500">Adresse</p>
+                    <p className="text-sm">{certificate.holderAddress}</p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-gray-500 flex items-center">
                       <CalendarIcon className="w-3 h-3 mr-1" />
-                      Date d'émission
+                      Émission
                     </p>
-                    <p className="text-sm">{new Date(certificate.issueDate).toLocaleDateString('fr-FR')}</p>
+                    <p className="text-sm">{formatDate(certificate.issueDate)}</p>
                   </div>
                   {certificate.expiryDate && (
                     <div>
@@ -251,7 +338,7 @@ const CitizenDashboard = () => {
                         <CalendarIcon className="w-3 h-3 mr-1" />
                         Expiration
                       </p>
-                      <p className="text-sm">{new Date(certificate.expiryDate).toLocaleDateString('fr-FR')}</p>
+                      <p className="text-sm">{formatDate(certificate.expiryDate)}</p>
                     </div>
                   )}
                 </div>
@@ -261,7 +348,7 @@ const CitizenDashboard = () => {
                     <BuildingOfficeIcon className="w-3 h-3 mr-1" />
                     Émetteur
                   </p>
-                  <p className="text-sm">{certificate.issuer}</p>
+                  <p className="text-sm">{formatAddress(certificate.issuer)}</p>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -312,6 +399,7 @@ const CitizenDashboard = () => {
           <li>• Les QR codes permettent une vérification instantanée</li>
           <li>• Les documents originaux sont stockés de manière décentralisée sur IPFS</li>
           <li>• Seul vous pouvez accéder à vos certificats avec votre wallet</li>
+          <li>• Les données sont récupérées en temps réel depuis le smart contract</li>
         </ul>
       </div>
     </div>
