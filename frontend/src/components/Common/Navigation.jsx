@@ -13,9 +13,24 @@ import {
 } from '@heroicons/react/24/outline';
 
 const Navigation = () => {
-  const { account, isConnected, isAuthorized, connectWallet, disconnectWallet } = useWeb3();
+  const { 
+    account, 
+    isConnected, 
+    isAuthorized, 
+    connectWallet, 
+    disconnectWallet, 
+    isLoading 
+  } = useWeb3();
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+
+  // DEBUG LOGS - Add these at the top
+  console.log('🔍 Navigation render - connectWallet type:', typeof connectWallet);
+  console.log('🔍 Navigation render - connectWallet function:', connectWallet);
+  console.log('🔍 Navigation render - isConnected:', isConnected);
+  console.log('🔍 Navigation render - isLoading:', isLoading);
+  console.log('🔍 Navigation render - account:', account);
 
   const isActivePath = (path) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
@@ -58,6 +73,49 @@ const Navigation = () => {
       current: isActivePath('/scan')
     }
   ];
+
+  // DEBUG FUNCTION for testing
+  const debugConnectWallet = async () => {
+    console.log('🟢 DEBUG Button Clicked - Starting comprehensive debug');
+    console.log('🔍 isConnected:', isConnected);
+    console.log('🔍 isLoading:', isLoading);
+    console.log('🔍 connectWallet type:', typeof connectWallet);
+    console.log('🔍 connectWallet function:', connectWallet);
+    
+    // Check if function exists
+    if (typeof connectWallet !== 'function') {
+      console.error('❌ connectWallet is not a function!');
+      console.log('🔍 Available Web3 context:', useWeb3());
+      alert('connectWallet is not a function! Check Web3Context.');
+      return;
+    }
+
+    // Check if MetaMask is available
+    if (!window.ethereum) {
+      console.error('❌ MetaMask not found');
+      alert('MetaMask not detected! Please install MetaMask extension.');
+      return;
+    }
+
+    console.log('✅ MetaMask detected:', window.ethereum);
+    
+    // Check if already connecting
+    if (isLoading) {
+      console.warn('⚠️ Already connecting...');
+      return;
+    }
+
+    // Try to call the function
+    try {
+      console.log('🔄 Calling connectWallet...');
+      await connectWallet();
+      console.log('✅ connectWallet completed successfully');
+    } catch (error) {
+      console.error('❌ Error in connectWallet:', error);
+      console.error('Error stack:', error.stack);
+      alert('Error connecting wallet: ' + error.message);
+    }
+  };
 
   return (
     <nav className="bg-white shadow-lg border-b-4 border-senegal-green">
@@ -112,18 +170,18 @@ const Navigation = () => {
             })}
           </div>
 
-          {/* Wallet connection */}
+          {/* Wallet connection - SIMPLE TEST FIRST */}
           <div className="flex items-center space-x-4">
             {!isConnected ? (
               <button
                 onClick={() => {
-                  console.log('🟢 Button Clicked');
+                  console.log('🚀 BUTTON CLICKED!');
                   connectWallet();
                 }}
                 className="flex items-center space-x-2 bg-senegal-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
                 <WalletIcon className="w-5 h-5" />
-                <span className="hidden sm:inline">Connecter Wallet</span>
+                <span>Connect Wallet</span>
               </button>
             ) : (
               <div className="flex items-center space-x-3">
@@ -226,6 +284,23 @@ const Navigation = () => {
                     <XMarkIcon className="w-5 h-5" />
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Mobile connect button if not connected */}
+            {!isConnected && (
+              <div className="px-3 py-2 border-t border-gray-200 mt-2">
+                <button
+                  onClick={() => {
+                    debugConnectWallet();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center space-x-2 bg-senegal-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                  disabled={isLoading}
+                >
+                  <WalletIcon className="w-5 h-5" />
+                  <span>{isLoading ? 'Connecting...' : 'Connecter Wallet [DEBUG]'}</span>
+                </button>
               </div>
             )}
           </div>

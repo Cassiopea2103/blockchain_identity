@@ -97,7 +97,7 @@ const Home = () => {
   return (
     <div className="space-y-16">
       {/* Hero Section */}
-      <section className="text-center py-16 bg-gradient-to-r from-senegal-green to-green-600 text-white rounded-2xl">
+      <section className="text-center py-16 bg-slate-500 text-white rounded-2xl">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-5xl font-bold mb-6">
             🇸🇳 Identité Numérique Sénégalaise
@@ -256,7 +256,7 @@ const Home = () => {
       </section>
 
       {/* Call to action */}
-      <section className="text-center py-12 bg-gradient-to-r from-senegal-yellow to-yellow-400 rounded-xl">
+      <section className="text-center py-12 bg-gradient-to-t bg-slate-900 to bg-cyan-200 rounded-xl">
         <h2 className="text-3xl font-bold mb-4 text-senegal-green">
           🚀 Prêt à découvrir l'avenir de l'administration ?
         </h2>

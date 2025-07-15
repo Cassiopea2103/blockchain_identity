@@ -446,3 +446,69 @@ a:focus {
 .shadow-senegal-lg {
   box-shadow: 0 20px 40px rgba(0, 150, 57, 0.2);
 }
+
+/* Add this to your CSS file (App.css or index.css) to debug the visibility issue */
+
+/* Force all navigation elements to be visible */
+nav * {
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: #000 !important; /* Force black text */
+}
+
+/* Force navigation links to be visible */
+nav a {
+  color: #374151 !important; /* Gray-700 */
+  opacity: 1 !important;
+}
+
+nav a:hover {
+  color: #059669 !important; /* Green-600 */
+  background-color: #f3f4f6 !important; /* Gray-100 */
+}
+
+/* Force buttons to be visible */
+nav button {
+  opacity: 1 !important;
+  visibility: visible !important;
+  background-color: #059669 !important; /* Green */
+  color: white !important;
+}
+
+/* Force main content to be visible */
+main * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Force form elements to be visible */
+input, label, span {
+  color: #374151 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Debug: Add red border to all elements to see layout */
+
+/* OR if you suspect Tailwind CSS variable issues, define them: */
+:root {
+  --senegal-green: #059669;
+  --senegal-yellow: #fbbf24;
+  --senegal-red: #dc2626;
+}
+
+.bg-senegal-green {
+  background-color: #059669 !important;
+}
+
+.text-senegal-green {
+  color: #059669 !important;
+}
+
+.bg-senegal-yellow {
+  background-color: #fbbf24 !important;
+}
+
+.text-senegal-yellow {
+  color: #fbbf24 !important;
+}
