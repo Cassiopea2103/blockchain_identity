@@ -1,12 +1,12 @@
 # 🇸🇳 Identité Numérique Sénégalaise - Blockchain
 
-## 📋 Vue d'ensemble
+##  Vue d'ensemble
 
 **Système de gestion décentralisée de l'identité numérique pour l'administration sénégalaise**
 
 Ce projet démontre comment la blockchain peut révolutionner la gestion des documents d'état civil au Sénégal, en offrant une solution sécurisée, transparente et accessible pour les citoyens, notamment la diaspora.
 
-### 🎯 Problématiques adressées
+###  Problématiques adressées
 
 - **Accès difficile** : Documents d'état civil difficiles d'accès en zones rurales
 - **Fraudes fréquentes** : Falsification de documents courante
@@ -14,15 +14,15 @@ Ce projet démontre comment la blockchain peut révolutionner la gestion des doc
 - **Processus longs** : Démarches administratives coûteuses et chronophages
 - **Vérification complexe** : Difficultés de validation des documents à l'international
 
-### 💡 Solution blockchain
+###  Solution blockchain
 
-- ✅ **Immutabilité** : Impossible de falsifier ou modifier les certificats
-- ✅ **Décentralisation** : Accès permanent, même si serveurs gouvernementaux indisponibles
-- ✅ **Transparence** : Toutes les actions tracées et vérifiables publiquement
-- ✅ **Interopérabilité** : Reconnaissance automatique à l'international
-- ✅ **Désintermédiation** : Vérification directe sans contacter l'administration
+- **Immutabilité** : Impossible de falsifier ou modifier les certificats
+-  **Décentralisation** : Accès permanent, même si serveurs gouvernementaux indisponibles
+-  **Transparence** : Toutes les actions tracées et vérifiables publiquement
+-  **Interopérabilité** : Reconnaissance automatique à l'international
+-  **Désintermédiation** : Vérification directe sans contacter l'administration
 
-## 🛠️ Architecture technique
+##  Architecture technique
 
 ### Stack technologique
 - **Blockchain** : Ethereum / Hardhat (développement local)
@@ -53,7 +53,7 @@ Ce projet démontre comment la blockchain peut révolutionner la gestion des doc
 - Documents PDF sur IPFS (simulé)
 - QR codes pour vérification rapide
 
-## 🚀 Installation et démarrage
+##  Installation et démarrage
 
 ### Prérequis
 
@@ -127,9 +127,9 @@ VITE_CONTRACT_ADDRESS=0xVotreAdresseDeContrat
 npm run dev
 ```
 
-## 🎬 Workflows et démonstration
+##  Workflows et démonstration
 
-### 🏛️ **Workflow 1 : Création de certificat (Autorité)**
+###  **Workflow 1 : Création de certificat (Autorité)**
 
 #### Étape 1 : Connexion autorité
 1. **Ouvrir l'application** → `http://localhost:5173`
@@ -164,14 +164,14 @@ npm run dev
 6. **QR Code généré** → Code affiché pour vérification
 
 #### Résultat workflow 1
-- ✅ Certificat enregistré sur blockchain
-- ✅ Transaction confirmée et immuable
-- ✅ QR code généré pour vérification
-- ✅ Événement émis pour traçabilité
+-  Certificat enregistré sur blockchain
+-  Transaction confirmée et immuable
+-  QR code généré pour vérification
+-  Événement émis pour traçabilité
 
 ---
 
-### 👤 **Workflow 2 : Consultation citoyenne**
+###  **Workflow 2 : Consultation citoyenne**
 
 #### Étape 1 : Connexion du détenteur
 1. **Changer de compte** dans MetaMask
@@ -198,14 +198,14 @@ npm run dev
    - **Vérifier** → Contrôle authenticité
 
 #### Résultat workflow 2
-- ✅ Accès sécurisé aux documents personnels
-- ✅ Données récupérées en temps réel
-- ✅ Interface intuitive et informative
-- ✅ Contrôle total par le détenteur
+-  Accès sécurisé aux documents personnels
+-  Données récupérées en temps réel
+-  Interface intuitive et informative
+-  Contrôle total par le détenteur
 
 ---
 
-### 🔍 **Workflow 3 : Vérification par tiers**
+###  **Workflow 3 : Vérification par tiers**
 
 #### Étape 1 : Accès vérification
 1. **Navigation** → Cliquer "Vérification"
@@ -232,14 +232,14 @@ npm run dev
 4. **Décision immédiate** basée sur preuve cryptographique
 
 #### Résultat workflow 3
-- ✅ Vérification instantanée et gratuite
-- ✅ Aucun intermédiaire requis
-- ✅ Preuve cryptographique solide
-- ✅ Réduction drastique des fraudes
+-  Vérification instantanée et gratuite
+-  Aucun intermédiaire requis
+-  Preuve cryptographique solide
+-  Réduction drastique des fraudes
 
 ---
 
-### 🔄 **Workflow 4 : Gestion administrative**
+###  **Workflow 4 : Gestion administrative**
 
 #### Étape 1 : Monitoring autorité
 1. **Tableau de bord** → Statistiques en temps réel
@@ -256,9 +256,9 @@ npm run dev
 2. **Webhooks** → Notifications en temps réel
 3. **Export données** → Rapports administratifs
 
-## 📊 Démonstration live - Script
+##  Démonstration live - Script
 
-### 🎯 **Introduction (5 min)**
+### **Introduction (5 min)**
 
 
 1. **Problème actuel** :
@@ -271,7 +271,7 @@ npm run dev
    - Vérification instantanée
    - Accessibilité mondiale
 
-### 🏛️ **Démo 1 : Autorité crée certificat (10 min)**
+###  **Démo 1 : Autorité crée certificat (10 min)**
 
 **"Simulons une mairie qui émet un acte de naissance"**
 
@@ -302,7 +302,7 @@ npm run dev
    → Expliquer utilisation mobile
    ```
 
-### 👤 **Démo 2 : Citoyen consulte documents (5 min)**
+###  **Démo 2 : Citoyen consulte documents (5 min)**
 
 **"Maintenant, le citoyen accède à ses documents"**
 
@@ -327,7 +327,7 @@ npm run dev
    - Partage sécurisé via QR
    ```
 
-### 🔍 **Démo 3 : Vérification tiers (5 min)**
+###  **Démo 3 : Vérification tiers (5 min)**
 
 **"Un employeur en France vérifie le diplôme"**
 
@@ -351,7 +351,7 @@ npm run dev
    Après : 10 secondes + gratuit + sûr
    ```
 
-### 📈 **Conclusion et impact (5 min)**
+###  **Conclusion et impact (5 min)**
 
 1. **Bénéfices économiques** :
    - Réduction 90% coûts vérification
@@ -368,7 +368,7 @@ npm run dev
    - Déploiement national : 12 mois
    - Intégration internationale : 24 mois
 
-## 🔧 Configuration avancée
+##  Configuration avancée
 
 ### Variables d'environnement
 
@@ -418,7 +418,7 @@ function getCertificatesByHolder(address _holder)
     external view returns (string[] memory)
 ```
 
-## 🧪 Tests et débogage
+##  Tests et débogage
 
 ### Tests unitaires
 
@@ -465,7 +465,7 @@ Gas usage: 150000
 Block Number: 2
 ```
 
-## 🚢 Déploiement production
+##  Déploiement production
 
 ### Testnets recommandés
 
@@ -511,7 +511,7 @@ identite-numerique-senegal/
 └── README.md
 ```
 
-## 📄 Licence
+##  Licence
 
 MIT License - Voir [LICENSE](LICENSE) pour détails.
 
