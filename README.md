@@ -24,6 +24,9 @@ Ce projet démontre comment la blockchain peut révolutionner la gestion des doc
 
 ##  Architecture technique
 
+<img width="1180" height="800" alt="blockchain_architecture_preview" src="https://github.com/user-attachments/assets/35ba7952-425c-4721-8b40-aa917acf58c6" />
+
+
 ### Stack technologique
 - **Blockchain** : Ethereum / Hardhat (développement local)
 - **Smart Contract** : Solidity ^0.8.19
